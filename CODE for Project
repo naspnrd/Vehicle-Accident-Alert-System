@@ -25,6 +25,9 @@ float logitude=0;
 String Speed="";
 String gpsString="";
 char *test="$GPRMC";
+//FSR
+int fsrAnalogPin = 0; // FSR is connected to analog 0
+int fsrReading;      
 
 void initModule(String cmd, char *res, int t)
 {
@@ -132,6 +135,10 @@ void loop()
     Serial.print("z=");
     Serial.println(zValue);
 
+    fsrReading = analogRead(fsrAnalogPin);
+    Serial.print("Analog reading = ");
+    Serial.println(fsrReading);
+  
     if(xValue < minVal || xValue > MaxVal  || yValue < minVal || yValue > MaxVal  || zValue < minVal || zValue > MaxVal)
     {
       get_gps();
@@ -144,7 +151,21 @@ void loop()
       delay(2000);
       lcd.clear();
       lcd.print("System Ready");
-    }       
+    }   
+    
+    if(fsrReading > 500)
+    {
+      get_gps();
+      show_coordinate();
+      lcd.clear();
+      lcd.print("Sending SMS ");
+      Serial.println("Sending SMS");
+      Send();
+      Serial.println("SMS Sent");
+      delay(2000);
+      lcd.clear();
+      lcd.print("System Ready");
+     }
 }
 
 void gpsEvent()
